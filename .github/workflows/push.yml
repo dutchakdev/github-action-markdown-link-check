@@ -1,5 +1,7 @@
 on: [pull_request]
 name: PR Checks
+permissions:
+  issues: write
 jobs:
   markdown-link-check:
     runs-on: ubuntu-latest
@@ -10,6 +12,8 @@ jobs:
       with:
         check-modified-files-only: 'yes'
         create-issue: 'yes'
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
   markdown-link-check-folders:
     runs-on: ubuntu-latest
     steps:
