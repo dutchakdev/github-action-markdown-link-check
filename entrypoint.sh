@@ -27,11 +27,14 @@ CHECK_MODIFIED_FILES="$6"
 BASE_BRANCH="$7"
 FILE_EXTENSION="${8:-.md}"
 FILE_PATH="$9"
-CREATE_ISSUE="${10:-false}"
+CREATE_ISSUE="${10:-'no'}"
 DEFAULT_ISSUE_TITLE="🔥 Dead {n} Links Found in Markdown Files"
 
 if [ -f "$CONFIG_FILE" ]; then
    ISSUE_TITLE=$(jq -r '.issue_title' "$CONFIG_FILE")
+   if [ -z "$ISSUE_TITLE" ]; then
+       ISSUE_TITLE="$DEFAULT_ISSUE_TITLE"
+   fi
    echo -e "${BLUE}Using markdown-link-check configuration file: ${YELLOW}$CONFIG_FILE${NC}"
 else
    ISSUE_TITLE="$DEFAULT_ISSUE_TITLE"
@@ -154,7 +157,6 @@ check_and_create_issue() {
                 ISSUE_TITLE="${ISSUE_TITLE//\{n\}/${#DEAD_LINKS}}"
                 ISSUE_BODY="$(read_issue_body)\n\n$DEAD_LINKS\n\n"
                 
-                # Use GitHub API to create the issue
                 GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/issues"
                 AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
                 ISSUE_DATA="{\"title\":\"$ISSUE_TITLE\",\"body\":\"$ISSUE_BODY\"}"
