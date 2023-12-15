@@ -253,6 +253,12 @@ On running the workflow described above, the output shown below is obtained
 ![image](https://user-images.githubusercontent.com/53875297/159135426-9f439d39-8bb3-40f0-9255-9efe2b493c1a.png)
 
 ## Issue auto-creation
+This feature is designed to automatically create issues in your GitHub repository when broken links are found in your markdown files. It leverages GitHub Actions to perform this task.
+
+The create-issue option is set to 'yes', which means an issue will be created if broken links are found. The gh-assignees and gh-labels options are currently empty, but you can specify GitHub usernames to automatically assign the created issues to, and labels to automatically apply to the created issues, respectively.
+
+In the gh-assignees field, replace 'user1,user2' with the actual GitHub usernames of the assignees. Similarly, in the gh-labels field, replace 'bug,documentation' with the actual labels you want to apply to the issues.
+
 ``` yml
 name: Check .md links
 
@@ -277,6 +283,9 @@ jobs:
       with:
         use-verbose-mode: 'yes'
         create-issue: 'yes'
+        gh-assignees: 'user1,user2' # Replace with actual GitHub usernames
+        gh-labels: 'bug,documentation' # Replace with actual labels
+
 ```
 
 ## Versioning

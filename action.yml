@@ -45,6 +45,15 @@ inputs:
     description: 'Create issue with broken links'
     required: true
     default: 'no'
+  gh-assignees:
+    description: 'Assignees for the issue'
+    required: false
+    default: ''
+  gh-labels:
+    description: 'Labels for the issue'
+    required: false
+    default: ''
+    
 runs:
   using: 'docker'
   image: 'Dockerfile'

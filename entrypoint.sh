@@ -28,6 +28,8 @@ BASE_BRANCH="$7"
 FILE_EXTENSION="${8:-.md}"
 FILE_PATH="$9"
 CREATE_ISSUE="${10:-'no'}"
+GH_ASSIGNEES="${11:-}"
+GH_LABELS="${12:-}"
 DEFAULT_ISSUE_TITLE="🔥 Dead {n} Links Found in Markdown Files"
 
 if [ -f "$CONFIG_FILE" ]; then
@@ -54,6 +56,8 @@ echo -e "${BLUE}CHECK_MODIFIED_FILES: $CHECK_MODIFIED_FILES${NC}"
 echo -e "${BLUE}FILE_EXTENSION: $FILE_EXTENSION${NC}"
 echo -e "${BLUE}FILE_PATH: $FILE_PATH${NC}"
 echo -e "${BLUE}CREATE_ISSUE: $CREATE_ISSUE${NC}"
+echo -e "${GH_ASSIGNEES:+GH_ASSIGNEES: $GH_ASSIGNEES${NC}}"
+echo -e "${GH_LABELS:+GH_LABELS: $GH_LABELS${NC}}"
 
 handle_dirs () {
    IFS=', ' read -r -a DIRLIST <<< "$FOLDER_PATH"
@@ -133,16 +137,32 @@ check_and_create_issue() {
             
             if [ "$CREATE_ISSUE" = "yes" ]; then
                echo -e "${BLUE}Creating an issue...${NC}"
-               # Create a new issue with the dead links
+
                DEAD_LINKS=$(cat error.txt)
                ISSUE_TITLE="${ISSUE_TITLE//\{n\}/${#DEAD_LINKS}}"
                ISSUE_BODY="$(read_issue_body)\n\n$DEAD_LINKS\n\n"
-               
+
                GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/issues"
                AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
-               ISSUE_DATA="{\"title\":\"$ISSUE_TITLE\",\"body\":\"$ISSUE_BODY\"}"
-               
-               curl -s -H "${AUTH_HEADER}" -d "${ISSUE_DATA}" "${GITHUB_API_URL}"
+               LABELS_JSON_ARRAY=$(jq -R -s -c 'split(",") | map(select(length > 0))' <<< "${GH_LABELS:-bug}")
+               ASSIGNEES_JSON_ARRAY=$(jq -R -s -c 'split(",") | map(select(length > 0))' <<< "$GH_ASSIGNEES")
+
+               ISSUE_DATA=$(jq -n \
+                           --arg title "$ISSUE_TITLE" \
+                           --arg body "$ISSUE_BODY" \
+                           --argjson labels "$LABELS_JSON_ARRAY" \
+                           --argjson assignees "$ASSIGNEES_JSON_ARRAY" \
+                           '{title: $title, body: $body, labels: $labels, assignees: $assignees}')
+
+               curl -L \
+                  -X POST \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "$AUTH_HEADER" \
+                  -H "Content-Type: application/json" \
+                  -d "$ISSUE_DATA" \
+                  "$GITHUB_API_URL"
+
+               echo -e "${BLUE}Issue created!${NC}"
             fi
 
             printf "\n"
