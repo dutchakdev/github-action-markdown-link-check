@@ -134,7 +134,7 @@ check_and_create_issue() {
             if [ "$CREATE_ISSUE" = "yes" ]; then
                echo -e "${BLUE}Creating an issue...${NC}"
                # Create a new issue with the dead links
-               DEAD_LINKS=$(grep -oP 'ERROR: \K[^ ]+' error.txt)
+               DEAD_LINKS=$(cat error.txt)
                ISSUE_TITLE="${ISSUE_TITLE//\{n\}/${#DEAD_LINKS}}"
                ISSUE_BODY="$(read_issue_body)\n\n$DEAD_LINKS\n\n"
                
