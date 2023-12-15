@@ -73,7 +73,9 @@ You customize the action by using the following variables:
 |`base-branch`|Use this variable to specify the branch to compare when finding modified markdown files. |`master`|
 |`file-extension`|By default the `github-action-markdown-link-check` action checks files in your repository with the `.md` extension. Use this option to specify a different file extension such as `.markdown` or `.mdx`.|`.md`|
 |`file-path` | Specify additional files (with complete path and extension) you want to check. Use comma separated values for checking multiple files. See [Check multiple directories and files](#check-multiple-directories-and-files) section for usage.| - |
-|`create-issue` | Enable this option to automatically create a new issue with details about the error links. When enabled, this action will generate a new issue in the repository, listing the Markdown files and the links that need attention. See [Check issue auto-creation](#issue-auto-creation) section for usage.| - |
+|`create-issue` | Enable this option to automatically create a new issue with details about the error links. When enabled, this action will generate a new issue in the repository, listing the Markdown files and the links that need attention. See [Check issue auto-creation](#issue-auto-creation) section for usage.| no |
+|`gh-assignees`| Comma-separated list of GitHub usernames to be automatically assigned to the created issues. For example, 'user1,user2'. Replace with actual GitHub usernames of the assignees. | - |
+|`gh-labels`| Comma-separated list of labels to be automatically applied to the created issues. For example, 'bug,documentation'. Replace with actual labels you want to apply to the issues. | - |
 
 #### Sample workflow with variables
 
