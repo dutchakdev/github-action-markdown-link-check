@@ -87,26 +87,6 @@ handle_files () {
    FILES="${COMMAND_FILES[*]}"
 }
 
-check_errors () {
-   if [ -e error.txt ]; then
-      if grep -q "ERROR:" error.txt; then
-         echo -e "${YELLOW}=========================> MARKDOWN LINK CHECK <=========================${NC}"
-         cat error.txt
-         printf "\n"
-         echo -e "${YELLOW}=========================================================================${NC}"
-         exit 113
-      else
-         echo -e "${YELLOW}=========================> MARKDOWN LINK CHECK <=========================${NC}"
-         printf "\n"
-         echo -e "${GREEN}[✔] All links are good!${NC}"
-         printf "\n"
-         echo -e "${YELLOW}=========================================================================${NC}"
-      fi
-   else
-      echo -e "${GREEN}All good!${NC}"
-   fi
-}
-
 add_options () {
    if [ -f "$CONFIG_FILE" ]; then
       FIND_CALL+=('--config' "$CONFIG_FILE")
@@ -144,34 +124,41 @@ read_issue_body() {
 
 # Create a function to check and create an issue
 check_and_create_issue() {
-    if [ "$CREATE_ISSUE" = "yes" ]; then
-        if [ -e error.txt ]; then
-            if grep -q "ERROR:" error.txt; then
-                echo -e "${YELLOW}=========================> MARKDOWN LINK CHECK <=========================${NC}"
-                cat error.txt
-                printf "\n"
-                echo -e "${YELLOW}=========================================================================${NC}"
-                
-                # Create a new issue with the dead links
-                DEAD_LINKS=$(grep -oP 'ERROR: \K[^ ]+' error.txt)
-                ISSUE_TITLE="${ISSUE_TITLE//\{n\}/${#DEAD_LINKS}}"
-                ISSUE_BODY="$(read_issue_body)\n\n$DEAD_LINKS\n\n"
-                
-                GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/issues"
-                AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
-                ISSUE_DATA="{\"title\":\"$ISSUE_TITLE\",\"body\":\"$ISSUE_BODY\"}"
-                
-                curl -s -H "${AUTH_HEADER}" -d "${ISSUE_DATA}" "${GITHUB_API_URL}"
-
-                printf "\n"
-                echo -e "${RED}[✖] Dead links found! An issue has been created.${NC}"
-                printf "\n"
-                echo -e "${YELLOW}=========================================================================${NC}"
+   if [ -e error.txt ]; then
+      if grep -q "ERROR:" error.txt; then
+            echo -e "${YELLOW}=========================> MARKDOWN LINK CHECK <=========================${NC}"
+            cat error.txt
+            printf "\n"
+            echo -e "${YELLOW}=========================================================================${NC}"
+            
+            if [ "$CREATE_ISSUE" = "yes" ]; then
+               # Create a new issue with the dead links
+               DEAD_LINKS=$(grep -oP 'ERROR: \K[^ ]+' error.txt)
+               ISSUE_TITLE="${ISSUE_TITLE//\{n\}/${#DEAD_LINKS}}"
+               ISSUE_BODY="$(read_issue_body)\n\n$DEAD_LINKS\n\n"
+               
+               GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/issues"
+               AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
+               ISSUE_DATA="{\"title\":\"$ISSUE_TITLE\",\"body\":\"$ISSUE_BODY\"}"
+               
+               curl -s -H "${AUTH_HEADER}" -d "${ISSUE_DATA}" "${GITHUB_API_URL}"
             fi
-        else
-            echo -e "${GREEN}All good!${NC}"
-        fi
-    fi
+
+            printf "\n"
+            echo -e "${RED}[✖] Dead links found! An issue has been created.${NC}"
+            printf "\n"
+            echo -e "${YELLOW}=========================================================================${NC}"
+            exit 113
+      else
+         echo -e "${YELLOW}=========================> MARKDOWN LINK CHECK <=========================${NC}"
+         printf "\n"
+         echo -e "${GREEN}[✔] All links are good!${NC}"
+         printf "\n"
+         echo -e "${YELLOW}=========================================================================${NC}"
+      fi
+   else
+      echo -e "${GREEN}All good!${NC}"
+   fi
 }
 
 if [ -z "$FILE_PATH" ]; then
@@ -215,8 +202,6 @@ if [ "$CHECK_MODIFIED_FILES" = "yes" ]; then
 
    check_additional_files
 
-   check_errors
-
    check_and_create_issue
 else
    if [ "$MAX_DEPTH" -ne -1 ]; then
@@ -234,8 +219,6 @@ else
    set +x
 
    check_additional_files
-
-   check_errors
 
    check_and_create_issue
 fi
