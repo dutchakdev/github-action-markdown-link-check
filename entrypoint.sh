@@ -122,27 +122,6 @@ read_issue_body() {
     fi
 }
 
-check_errors () {
-   if [ -e error.txt ]; then
-      if grep -q "ERROR:" error.txt; then
-         echo -e "${YELLOW}=========================> MARKDOWN LINK CHECK <=========================${NC}"
-         cat error.txt
-         printf "\n"
-         echo -e "${YELLOW}=========================================================================${NC}"
-         exit 113
-      else
-         echo -e "${YELLOW}=========================> MARKDOWN LINK CHECK <=========================${NC}"
-         printf "\n"
-         echo -e "${GREEN}[✔] All links are good!${NC}"
-         printf "\n"
-         echo -e "${YELLOW}=========================================================================${NC}"
-      fi
-   else
-      echo -e "${GREEN}All good!${NC}"
-   fi
-}
-
-
 # Create a function to check and create an issue
 check_and_create_issue() {
    if [ -e error.txt ]; then
@@ -223,8 +202,6 @@ if [ "$CHECK_MODIFIED_FILES" = "yes" ]; then
 
    check_additional_files
 
-   check_errors
-
    check_and_create_issue
 else
    if [ "$MAX_DEPTH" -ne -1 ]; then
@@ -242,8 +219,6 @@ else
    set +x
 
    check_additional_files
-
-   check_errors
 
    check_and_create_issue
 fi
