@@ -73,7 +73,9 @@ You customize the action by using the following variables:
 |`base-branch`|Use this variable to specify the branch to compare when finding modified markdown files. |`master`|
 |`file-extension`|By default the `github-action-markdown-link-check` action checks files in your repository with the `.md` extension. Use this option to specify a different file extension such as `.markdown` or `.mdx`.|`.md`|
 |`file-path` | Specify additional files (with complete path and extension) you want to check. Use comma separated values for checking multiple files. See [Check multiple directories and files](#check-multiple-directories-and-files) section for usage.| - |
-|`create-issue` | Enable this option to automatically create a new issue with details about the error links. When enabled, this action will generate a new issue in the repository, listing the Markdown files and the links that need attention. See [Check issue auto-creation](#issue-auto-creation) section for usage.| - |
+|`create-issue` | Enable this option to automatically create a new issue with details about the error links. When enabled, this action will generate a new issue in the repository, listing the Markdown files and the links that need attention. See [Check issue auto-creation](#issue-auto-creation) section for usage.| no |
+|`gh-assignees`| Comma-separated list of GitHub usernames to be automatically assigned to the created issues. For example, 'user1,user2'. Replace with actual GitHub usernames of the assignees. | - |
+|`gh-labels`| Comma-separated list of labels to be automatically applied to the created issues. For example, 'bug,documentation'. Replace with actual labels you want to apply to the issues. | - |
 
 #### Sample workflow with variables
 
@@ -253,6 +255,12 @@ On running the workflow described above, the output shown below is obtained
 ![image](https://user-images.githubusercontent.com/53875297/159135426-9f439d39-8bb3-40f0-9255-9efe2b493c1a.png)
 
 ## Issue auto-creation
+This feature is designed to automatically create issues in your GitHub repository when broken links are found in your markdown files. It leverages GitHub Actions to perform this task.
+
+The create-issue option is set to 'yes', which means an issue will be created if broken links are found. The gh-assignees and gh-labels options are currently empty, but you can specify GitHub usernames to automatically assign the created issues to, and labels to automatically apply to the created issues, respectively.
+
+In the gh-assignees field, replace 'user1,user2' with the actual GitHub usernames of the assignees. Similarly, in the gh-labels field, replace 'bug,documentation' with the actual labels you want to apply to the issues.
+
 ``` yml
 name: Check .md links
 
@@ -277,6 +285,9 @@ jobs:
       with:
         use-verbose-mode: 'yes'
         create-issue: 'yes'
+        gh-assignees: 'user1,user2' # Replace with actual GitHub usernames
+        gh-labels: 'bug,documentation' # Replace with actual labels
+
 ```
 
 ## Versioning
