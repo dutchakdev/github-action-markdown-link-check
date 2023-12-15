@@ -1,7 +1,7 @@
 
 ## Test internal and external links
 
-www.google.com
+www.google.com 
 
 <!-- markdown-link-check-disable-next-line -->
 [This is a broken link](https://www.exampleexample.cox)

@@ -154,7 +154,7 @@ check_and_create_issue() {
                            --argjson assignees "$ASSIGNEES_JSON_ARRAY" \
                            '{title: $title, body: $body, labels: $labels, assignees: $assignees}')
 
-               echi "$ISSUE_DATA"
+               echo "$ISSUE_DATA"
 
                curl -L \
                   -X POST \
