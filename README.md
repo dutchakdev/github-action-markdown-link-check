@@ -94,7 +94,7 @@ jobs:
         config-file: 'mlc_config.json'
         folder-path: 'docs/markdown_files'
         max-depth: 2
-        create-issue: true
+        create-issue: 'no'
 ```
 
 ### Scheduled runs
@@ -253,6 +253,31 @@ On running the workflow described above, the output shown below is obtained
 ![image](https://user-images.githubusercontent.com/53875297/159135426-9f439d39-8bb3-40f0-9255-9efe2b493c1a.png)
 
 ## Issue auto-creation
+``` yml
+name: Check .md links
+
+on:
+  push: [master]
+
+permissions:
+  issues: write
+
+jobs:
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    # check out the latest version of the code
+    steps:
+    - uses: actions/checkout@v3
+
+    # Checks the status of hyperlinks in .md files in verbose mode
+    - name: Check links
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        use-verbose-mode: 'yes'
+        create-issue: 'yes'
+```
 
 ## Versioning
 GitHub Action - Markdown link check follows the [GitHub recommended versioning strategy](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md).
